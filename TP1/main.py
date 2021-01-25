@@ -17,6 +17,22 @@ votes['item.id'] -= 1
 
 m_votes = csr_matrix((votes['rating'], (votes['user.id'], votes['item.id']))).toarray()
 
+
+def k_fold(nb_fold, nb_data):
+    random_state = np.random.RandomState(1)
+    fold_rand_value = random_state.rand(nb_data)
+
+    return np.array([(1/nb_fold*i < fold_rand_value) == (fold_rand_value < 1/nb_fold*(i+1)) for i in range(nb_fold)])
+
+
+fold_array = k_fold(10,n_votes)
+for i in range(len(fold_array)):
+    print(np.sum(fold_array[i]))
+    print(fold_array[i])
+
+votes['rating'][fold_array[5]] = -1 #replace rating value in votes by a value
+print(votes)
+
 #EndRegion
 
 #Region[Green] Average votes prediction
@@ -36,3 +52,4 @@ for u in range(n_users):
 print(avg_votes)
 
 #EndRegion
+
