@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix
 
-from cross_valid import cross_validation
+from scripts.cross_valid import cross_validation
 
 #Region[Blue] Init : read csv data
 

@@ -18,8 +18,7 @@ def k_fold(nb_fold, data):
         start = end
         end = len(data) if (i + 1 == nb_fold - 1) else end + item_per_fold
     return folds
-
-
+    
 # EndRegion
 
 # Region[Green] Cross-validation
