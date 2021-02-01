@@ -21,6 +21,6 @@ votes['item.id'] -= 1
 
 #Region[Cyan] Question 1
 
-result_q1 = cross_validation(votes, users, items, 10, True)
+result_q1 = cross_validation(votes, users, items, 10, False)
 print(result_q1)
 #EndRegion

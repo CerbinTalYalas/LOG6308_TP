@@ -35,9 +35,9 @@ def predict(uid, iid, model):
         avg_i = np.mean(model[:, iid][model[:, iid] > 0])
 
     if np.isnan(avg_u):
-        avg_u = 0
+        return avg_i
     if np.isnan(avg_i):
-        avg_i = 0
+        return avg_u
 
     return (avg_u + avg_i) / 2
 
@@ -55,7 +55,7 @@ def unit_test(test_index, folds, users, items):
         pred = predict(vote["user.id"], vote["item.id"], model)
         err.append((vote["rating"] - pred) ** 2)
 
-    return np.mean(err)
+    return np.nanmean(err)
 
 
 def cross_validation(votes, users, items, n_folds=10, verbose=False):
