@@ -5,7 +5,7 @@ from scipy.sparse import csr_matrix
 
 from scripts.cross_valid import cross_validation
 #from item_item import ii_cos_matrix
-from scripts.agglomeration import agglomeration
+from scripts.agglomeration import agglomeration_1, agglomeration_2
 
 QUESTION = "Q4"
 
@@ -58,5 +58,5 @@ if QUESTION == "Q1" or QUESTION == "ALL":
 if QUESTION == "Q4" or QUESTION == "ALL":
     cluster_size = [5,10,20,40,80]
     for size in cluster_size:
-        err = agglomeration(votes, 5, size)
-        print("La mse avec 5 replis et " + str(size) + " cluster est de " + str(err))
+        err = agglomeration_1(votes, 5, size)
+        print("La mse avec 5 replis et " + str(size) + " clusters est de " + str(err))
