@@ -8,9 +8,10 @@ import math
 from scipy.sparse import csr_matrix
 from sklearn.cluster import KMeans
 
+# Region[Red] K-fold
 
 def k_fold(nb_fold, data):
-    shuffle_data = data.sample(frac=1, random_state=69)
+    shuffle_data = data.sample(frac=1, random_state=10)
     folds = []
     item_per_fold = math.floor(len(shuffle_data) / nb_fold)
     start, end = 0, item_per_fold
@@ -19,7 +20,10 @@ def k_fold(nb_fold, data):
         start = end
         end = len(data) if (i + 1 == nb_fold - 1) else end + item_per_fold
     return folds
+    
+# EndRegion
 
+#Region[Green] Clustering
 
 def mean_without_zero(data, axis=0):
     with warnings.catch_warnings():
@@ -142,6 +146,8 @@ def agglomeration_2(data, n_folds, n_cluster):
         err.append(mse(test_set_pd, clusters, clusters_mean))
 
     return np.mean(err)
+
+#EndRegion
 
 """random_N = np.random.rand(*train_set_np.shape)
 random_N = random_N - 0.5

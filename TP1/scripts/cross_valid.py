@@ -5,7 +5,6 @@ import math
 import warnings
 from scipy.sparse import csr_matrix
 
-
 # Region[Red] K-fold
 
 def k_fold(nb_fold, data):
@@ -23,7 +22,7 @@ def k_fold(nb_fold, data):
 
 # Region[Green] Cross-validation
 
-def train(data_train, users, items):
+def train(data_train):
     model = csr_matrix((data_train['rating'], (data_train['user.id'], data_train['item.id']))).toarray()
     return model
 
@@ -42,13 +41,13 @@ def predict(uid, iid, model):
     return (avg_u + avg_i) / 2
 
 
-def unit_test(test_index, folds, users, items):
+def unit_test(test_index, folds):
     test_set = folds[test_index]
     empty_set = test_set.copy()
     empty_set['rating'] = 0
     train_set = pd.concat(folds[:test_index] + [empty_set] + folds[test_index + 1:])
 
-    model = train(train_set, users, items)
+    model = train(train_set)
 
     err = []
     for _, vote in test_set.iterrows():
@@ -58,11 +57,11 @@ def unit_test(test_index, folds, users, items):
     return np.nanmean(err)
 
 
-def cross_validation(votes, users, items, n_folds=10, verbose=False):
+def cross_validation(votes, n_folds=10, verbose=False):
     folds = k_fold(n_folds, votes)
     err = []
     for i in range(n_folds):
-        err.append(unit_test(i, folds, users, items))
+        err.append(unit_test(i, folds))
     if (verbose): print(err)
     return np.mean(err)
 

@@ -4,10 +4,14 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
 
 from scripts.cross_valid import cross_validation
+
 #from item_item import ii_cos_matrix
+
+from scripts.svd import dim_test
+
 from scripts.agglomeration import agglomeration_1, agglomeration_2
 
-QUESTION = "Q4"
+QUESTION = [True, False, True, True]
 
 # Region[Blue] Init : read csv data
 
@@ -26,15 +30,15 @@ model = csr_matrix((votes['rating'], (votes['user.id'], votes['item.id']))).toar
 
 # EndRegion
 
-if QUESTION == "Q1" or QUESTION == "ALL":
+if QUESTION[0]:
     # Region[Cyan] Question 1
-
-    result_q1 = cross_validation(votes, users, items, 10, False)
-    print("Q1. Erreur quadratique moyenne : " + str(result_q1))
+    print("Q1. Calcul de la MSE pour un seuil de comparaison (validation croisée, 10 replis)")
+    result_q1 = cross_validation(votes, 10, False)
+    print("Erreur quadratique moyenne : " + str(result_q1))
 
 # EndRegion
 
-"""if QUESTION == "Q2" or QUESTION == "ALL":
+"""if QUESTION[1]:
     # Region[Cyan] Question 2
 
     cos_matrix = ii_cos_matrix(model)
@@ -55,8 +59,17 @@ if QUESTION == "Q1" or QUESTION == "ALL":
 
 # EndRegion"""
 
-if QUESTION == "Q4" or QUESTION == "ALL":
+if QUESTION[2]:
+    print("Q3. Choix des dimensions à garder pour SVD - on minimise l'erreur par cross-validation avec 5 replis")
+    dim, err = dim_test(votes)
+    print("On choisit de garder "+str(dim)+" dimensions, et on a alors une erreur de "+str(err))
+    print("- - -")
+
+
+if QUESTION[3]:
+    print("Q4. Calcul de MSE pour différentes tailles de classes pour l'approche par agglomération")
     cluster_size = [5,10,20,40,80]
     for size in cluster_size:
         err = agglomeration_1(votes, 5, size)
-        print("La mse avec 5 replis et " + str(size) + " clusters est de " + str(err))
+        print("La MSE avec 5 replis et " + str(size) + " clusters est de " + str(err))
+    print("- - -")
