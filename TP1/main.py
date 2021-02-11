@@ -4,12 +4,9 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
 
 from scripts.cross_valid import cross_validation
-
-#from item_item import ii_cos_matrix
-
+from scripts.item_item import cos_matrix, vote_commun, nb_voisins
 from scripts.svd import dim_test
-
-from scripts.agglomeration import agglomeration_1, agglomeration_2
+from scripts.agglomeration import agglomeration
 
 QUESTION = [True, False, True, True]
 
@@ -39,11 +36,14 @@ if QUESTION[0]:
 
 # EndRegion
 
-"""if QUESTION[1]:
+if QUESTION[1]:
     # Region[Cyan] Question 2
 
-    cos_matrix = ii_cos_matrix(model)
+    cos_matrix = cos_matrix(model)
     triangular_cos = np.tril(cos_matrix)
+
+    vote = vote_commun(model)
+    voisin = nb_voisins(vote)
 
     # Question 2.a.
 
@@ -58,7 +58,6 @@ if QUESTION[0]:
 
     # Question 2.b.
 
-# EndRegion"""
 
 if QUESTION[2]:
     print("Q3. Choix des dimensions à garder pour SVD - on minimise l'erreur par cross-validation avec 5 replis")
@@ -71,6 +70,6 @@ if QUESTION[3]:
     print("Q4. Calcul de MSE pour différentes tailles de classes pour l'approche par agglomération")
     cluster_size = [5,10,20,40,80]
     for size in cluster_size:
-        err = agglomeration_1(votes, 5, size)
+        err = agglomeration(votes, 5, size)
         print("La MSE avec 5 replis et " + str(size) + " clusters est de " + str(err))
     print("- - -")

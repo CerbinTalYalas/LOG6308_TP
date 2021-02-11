@@ -47,4 +47,16 @@ def w_analysis(w):
     p_zeros = 1-np.count_nonzero(w)/len(w)
     print("Proportion de poids nuls parmi les voisins : "+str(p_zeros*100)[:4]+" %")
 
+def vote_commun(model):
+    model_vote = np.ma.masked_where(model != 0, model).mask
+    model_vote = model_vote.astype(int)
+    nb_vote_commun = np.matmul(model_vote.transpose(), model_vote)
+    np.fill_diagonal(nb_vote_commun, 0)
+    return nb_vote_commun
+
+def nb_voisins(data):
+    voisin = np.ma.masked_where(data != 0, data).mask
+    return voisin.sum(axis=0) #2a
+
+
 #EndRegion
