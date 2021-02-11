@@ -8,7 +8,7 @@ from scripts.item_item import cos_matrix, vote_commun, nb_voisins
 from scripts.svd import dim_test
 from scripts.agglomeration import agglomeration
 
-QUESTION = [True, False, True, True]
+QUESTION = [False, False, True, False]
 
 # Region[Blue] Init : read csv data
 

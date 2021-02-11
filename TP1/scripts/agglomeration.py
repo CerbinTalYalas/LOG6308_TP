@@ -111,3 +111,5 @@ def agglomeration(data, n_folds, n_cluster):
         err.append(mse(test_set_pd, clusters, clusters_mean))
 
     return np.mean(err)
+
+#EndRegion

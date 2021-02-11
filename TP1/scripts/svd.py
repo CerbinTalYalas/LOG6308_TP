@@ -32,6 +32,11 @@ def svd_decomp_reduc(model, k):
     s = s * (k*[1.0]+(len(s)-k)*[0.0])
     return u, np.diag(s), vh
 
+def vote_norm(x):
+    return min(5,max(1,x))
+
+matrix_norm = np.vectorize(vote_norm)
+
 #EndRegion
 
 #Region[Green] Cross validation
@@ -40,7 +45,7 @@ def train(data_train, k):
     model_raw = csr_matrix((data_train['rating'], (data_train['user.id'], data_train['item.id']))).toarray()
     u, s, vh = svd_decomp_reduc(model_raw, k)
     svd_matrix = u @ s @ vh
-    return svd_matrix
+    return matrix_norm(svd_matrix)
 
 def unit_test(test_index, folds, k):
     test_set = folds[test_index]
