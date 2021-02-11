@@ -35,6 +35,7 @@ if QUESTION[0]:
     print("Q1. Calcul de la MSE pour un seuil de comparaison (validation croisée, 10 replis)")
     result_q1 = cross_validation(votes, 10, False)
     print("Erreur quadratique moyenne : " + str(result_q1))
+    print("- - -")
 
 # EndRegion
 
