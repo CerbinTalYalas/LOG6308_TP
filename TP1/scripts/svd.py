@@ -43,6 +43,13 @@ matrix_norm = np.vectorize(vote_norm)
 
 def train(data_train, k):
     model_raw = csr_matrix((data_train['rating'], (data_train['user.id'], data_train['item.id']))).toarray()
+    
+    # Imputation
+    for i in range(len(model_raw[0])):
+        m = np.nanmean(model_raw[:,i])
+        col = model_raw[:,i]
+        col[col == 0] = m
+
     u, s, vh = svd_decomp_reduc(model_raw, k)
     svd_matrix = u @ s @ vh
     return matrix_norm(svd_matrix)

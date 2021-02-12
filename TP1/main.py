@@ -28,7 +28,8 @@ model = csr_matrix((votes['rating'], (votes['user.id'], votes['item.id']))).toar
 # EndRegion
 
 if QUESTION[0]:
-    # Region[Cyan] Question 1
+# Region[Cyan] Question 1
+
     print("Q1. Calcul de la MSE pour un seuil de comparaison (validation croisée, 10 replis)")
     result_q1 = cross_validation(votes, 10, False)
     print("Erreur quadratique moyenne : " + str(result_q1))
