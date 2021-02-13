@@ -58,5 +58,4 @@ def nb_voisins(data):
     voisin = np.ma.masked_where(data != 0, data).mask
     return voisin.sum(axis=0) #2a
 
-
 #EndRegion
