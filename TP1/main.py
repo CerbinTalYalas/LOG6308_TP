@@ -64,6 +64,14 @@ def main(QU1=True, QU2=False, QU3=True, QU4=True):
         print("Q2.a. Proportion de poids nuls : " + str(p_zeros * 100)[:4] + " %")
 
         # Question 2.b.
+        vote = vote_commun(model)
+        voisin = nb_voisins(vote)
+
+        plt.hist(voisin, bins=168)
+        plt.title("Q2.b. Distribution du nombre de voisin avec vote commun par item")
+        plt.ylabel("Nombre d'occurence")
+        plt.xlabel("Nombre de voisin")
+        plt.show()
 
     #EndRegion
 
@@ -77,7 +85,6 @@ def main(QU1=True, QU2=False, QU3=True, QU4=True):
         print("- - -")
 
     #EndRegion
-
 
     # Region[Cyan] Question 4
 
