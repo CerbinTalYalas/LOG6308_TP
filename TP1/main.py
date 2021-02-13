@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
 
 from scripts.cross_valid import cross_validation
-from scripts.item_item import cos_matrix, vote_commun, nb_voisins
+from scripts.item_item import cos_matrix, votes_communs, nb_voisins, compute_votes_manquants
 from scripts.svd import dim_test
 from scripts.agglomeration import agglomeration
 
@@ -14,7 +14,7 @@ from scripts.agglomeration import agglomeration
 #######################################################################
 '''
 
-def main(QU1=True, QU2=False, QU3=True, QU4=True):
+def main(QU1=False, QU2=False, QU3=False, QU4=False):
 
     # Region[Blue] Init : read csv data
 
@@ -64,8 +64,8 @@ def main(QU1=True, QU2=False, QU3=True, QU4=True):
         print("Q2.a. Proportion de poids nuls : " + str(p_zeros * 100)[:4] + " %")
 
         # Question 2.b.
-        vote = vote_commun(model)
-        voisin = nb_voisins(vote)
+        vote = votes_communs(model)
+        voisins = nb_voisins(vote)
 
         plt.hist(voisin, bins=168)
         plt.title("Q2.b. Distribution du nombre de voisin avec vote commun par item")
@@ -74,7 +74,6 @@ def main(QU1=True, QU2=False, QU3=True, QU4=True):
         plt.show()
 
     #EndRegion
-
 
     # Region[Cyan] Question 3
     
@@ -97,5 +96,7 @@ def main(QU1=True, QU2=False, QU3=True, QU4=True):
         print("- - -")
 
     #EndRegion
+
+    print(compute_votes_manquants(votes, model))
 
 main()

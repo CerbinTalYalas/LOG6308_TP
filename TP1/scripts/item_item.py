@@ -7,7 +7,7 @@ import time
 import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
 
-#Region[Yellow] Item_item
+#Region[Yellow] Item_item prediction
 
 def cos_matrix(model):
     cos_matrix = 1.0*np.matmul(model.transpose(),model)
@@ -36,6 +36,10 @@ def predict(uid, iid, model, k, dist_matrix, verbose = True):
     predict = np.mean(model[:, iid][model[:, iid] > 0])+(1/np.linalg.norm(w, ord=1))*np.matmul(w.transpose(), s)
     return max(1,min(5,predict))
 
+#EndRegion
+
+#Region[DGray] item-item analysis
+
 def w_analysis(w):
 
     plt.hist(w[w>0], color='cyan', edgecolor = 'black', bins= 250)
@@ -47,7 +51,7 @@ def w_analysis(w):
     p_zeros = 1-np.count_nonzero(w)/len(w)
     print("Proportion de poids nuls parmi les voisins : "+str(p_zeros*100)[:4]+" %")
 
-def vote_commun(model):
+def votes_communs(model):
     model_vote = np.ma.masked_where(model != 0, model).mask
     model_vote = model_vote.astype(int)
     nb_vote_commun = np.matmul(model_vote.transpose(), model_vote)
@@ -57,5 +61,19 @@ def vote_commun(model):
 def nb_voisins(data):
     voisin = np.ma.masked_where(data != 0, data).mask
     return voisin.sum(axis=0) #2a
+
+def prop_votes_manquants(uid, iid, model, voisins=None):
+    if voisins is None : voisins = nb_voisins(votes_communs(model))
+    votes_user = np.count_nonzero(model[uid])
+    return (voisins[iid]-(votes_user-1))/voisins[iid]
+
+def compute_votes_manquants(votes_pd, model):
+    voisins = nb_voisins(votes_communs(model))
+    res = np.zeros(model.shape)
+    for _, vote in votes_pd.iterrows():
+        uid = vote["user.id"]
+        iid = vote["item.id"]
+        res[uid,iid] = prop_votes_manquants(uid, iid, model, voisins)
+    return res
 
 #EndRegion
