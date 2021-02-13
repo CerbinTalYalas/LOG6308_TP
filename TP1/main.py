@@ -8,7 +8,7 @@ from scripts.item_item import cos_matrix, vote_commun, nb_voisins
 from scripts.svd import dim_test
 from scripts.agglomeration import agglomeration
 
-QUESTION = [False, False, True, False]
+QUESTION = [False, True, False, False]
 
 # Region[Blue] Init : read csv data
 
@@ -43,9 +43,6 @@ if QUESTION[1]:
     cos_matrix = cos_matrix(model)
     triangular_cos = np.tril(cos_matrix)
 
-    vote = vote_commun(model)
-    voisin = nb_voisins(vote)
-
     # Question 2.a.
 
     plt.hist(triangular_cos[triangular_cos > 0], color='cyan', edgecolor='black', bins=250)
@@ -58,6 +55,14 @@ if QUESTION[1]:
     print("Q2.a. Proportion de poids nuls : " + str(p_zeros * 100)[:4] + " %")
 
     # Question 2.b.
+    vote = vote_commun(model)
+    voisin = nb_voisins(vote)
+
+    plt.hist(voisin, bins=168)
+    plt.title("Q2.b. Distribution du nombre de voisin avec vote commun par item")
+    plt.ylabel("Nombre d'occurence")
+    plt.xlabel("Nombre de voisin")
+    plt.show()
 
 
 if QUESTION[2]:
