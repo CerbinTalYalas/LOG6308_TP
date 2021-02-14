@@ -4,10 +4,11 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
 
 from scripts.cross_valid import cross_validation
-from scripts.item_item import cos_matrix, votes_communs, nb_voisins, compute_votes_manquants, predict
-from scripts.svd import dim_test
+from scripts.item_item import cos_matrix, votes_communs, nb_voisins, compute_votes_manquants
+from scripts.svd import dim_test, svd_cross_validation
 from scripts.agglomeration import agglomeration
 from scripts.item_item_v2 import predict_i, cos_matrix, closest_neighbor, compute_K, compute_mean_R_0
+import scripts.svd as d
 
 '''
 #######################################################################
@@ -16,6 +17,8 @@ from scripts.item_item_v2 import predict_i, cos_matrix, closest_neighbor, comput
 '''
 
 def main(QU1=False, QU2=True, QU3=False, QU4=False):
+
+    plt.ion()
 
     # Region[Blue] Init : read csv data
 
@@ -37,7 +40,7 @@ def main(QU1=False, QU2=True, QU3=False, QU4=False):
     # Region[Cyan] Question 1
 
     if QU1:
-        print("Q1. Calcul de la MSE pour un seuil de comparaison (validation croisée, 10 replis)")
+        print("Q1. Calcul de la MSE de l'approche moyenne pour établir un seuil de comparaison (validation croisée, 10 replis)")
         result_q1 = cross_validation(votes, 10, False)
         print("Erreur quadratique moyenne : " + str(result_q1))
         print("- - -")
@@ -67,29 +70,27 @@ def main(QU1=False, QU2=True, QU3=False, QU4=False):
         """cos_matrix = cos_matrix(model)
         triangular_cos = np.tril(cos_matrix)
 
-        vote = vote_commun(model)
-        voisin = nb_voisins(vote)
+        vote_comm = votes_communs(model)
+        voisins = nb_voisins(vote_comm)
 
         # Question 2.a.
 
         plt.hist(triangular_cos[triangular_cos > 0], color='cyan', edgecolor='black', bins=250)
-        plt.title("Q2.a. Distribution des similarité")
+        plt.title("Q2.a. Distribution des similarités")
         plt.ylabel("Nombre d'occurence")
         plt.xlabel("Valeur de cosinus")
-        plt.show()
+        plt.show(block=True)
 
-        p_zeros = 1 - np.count_nonzero(cos_matrix) / (2 * n_items * (n_items + 1) / 2)
+        p_zeros = 1 - np.count_nonzero(cos_mat) / (2 * n_items * (n_items + 1) / 2)
         print("Q2.a. Proportion de poids nuls : " + str(p_zeros * 100)[:4] + " %")
 
         # Question 2.b.
-        vote = votes_communs(model)
-        voisins = nb_voisins(vote)
 
-        plt.hist(voisin, bins=168)
+        plt.hist(voisins, bins=168)
         plt.title("Q2.b. Distribution du nombre de voisin avec vote commun par item")
         plt.ylabel("Nombre d'occurence")
         plt.xlabel("Nombre de voisin")
-        plt.show()"""
+        plt.show(block=True)"""
 
     #EndRegion
 
@@ -97,7 +98,16 @@ def main(QU1=False, QU2=True, QU3=False, QU4=False):
     
     if QU3:
         print("Q3. Choix des dimensions à garder pour SVD - on minimise l'erreur par cross-validation avec 5 replis")
-        dim, err = dim_test(votes)
+
+        dim_min, dim_max = 5, 20
+        dim, err, err_list = dim_test(votes, dim_min, dim_max)
+
+        plt.plot(range(dim_min, dim_max+1), err_list,'d-r')
+        plt.title("Erreur quadratique moyenne de l'approche SVD pour différents choix de dimensions")
+        plt.ylabel("MSE")
+        plt.xlabel("k")
+        plt.show(block=True)
+        
         print("On choisit de garder "+str(dim)+" dimensions, et on a alors une erreur de "+str(err))
         print("- - -")
 
@@ -115,6 +125,6 @@ def main(QU1=False, QU2=True, QU3=False, QU4=False):
 
     #EndRegion
 
-    res = compute_votes_manquants(votes, model)
-    a=0
-main()
+    #print(d.svd_cross_validation(votes, 14, 5, True))
+
+main(False, False, True, False)
