@@ -75,6 +75,7 @@ def main(QU1=False, QU2=True, QU3=True, QU4=False):
 
         vote_comm = votes_communs(model)
         voisins = nb_voisins(vote_comm)
+
         
         plt.hist(voisins, bins=168, color='cyan', edgecolor='black')
         plt.title("Q2.b. Distribution du nombre de voisin avec vote commun par item")
@@ -82,6 +83,19 @@ def main(QU1=False, QU2=True, QU3=True, QU4=False):
         plt.xlabel("Nombre de voisin")
         
         plt.show(block=True)
+
+        pl_voisins_vote_commun = []
+        for uid in range(model.shape[0]):
+            for iid in range(model.shape[1]):
+                nvoisins = voisins[iid]
+                nusers = np.count_nonzero(model[uid])-1*(model[uid,iid] != 0)
+                pl_voisins_vote_commun.append((nvoisins-nusers)/nvoisins)
+
+        p_voisins_vote_commun = np.mean(pl_voisins_vote_commun)
+
+        print("Q2.b. Proportion moyenne de votes manquants parmi tous les voisins d'un item : " + str(p_voisins_vote_commun * 100)[
+                                                                                             :4] + " %")
+
 
         # Question 2.d.
 
@@ -130,4 +144,4 @@ def main(QU1=False, QU2=True, QU3=True, QU4=False):
     # EndRegion
 
 
-main(True, True, True, True)
+main(False, True, False, False)
