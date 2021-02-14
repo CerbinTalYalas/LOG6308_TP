@@ -63,10 +63,6 @@ def main(QU1=False, QU2=True, QU3=False, QU4=False):
             K_i = compute_K(v_0_i,w_i)
             res[:,iid] = predict_i(mean[iid], K_i, v_0_i, w_i)
 
-
-
-        a = predict(0, 0, model, 10, cos)
-        b = 0
         """cos_matrix = cos_matrix(model)
         triangular_cos = np.tril(cos_matrix)
 
