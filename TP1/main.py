@@ -4,10 +4,9 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
 
 from scripts.cross_valid import cross_validation
-from scripts.item_item import cos_matrix, votes_communs, nb_voisins, compute_votes_manquants
 from scripts.svd import dim_test, svd_cross_validation
 from scripts.agglomeration import agglomeration
-from scripts.item_item_v2 import predict_i, cos_matrix, closest_neighbor, compute_K, compute_mean_R_0
+from scripts.item_item import predict_i, cos_matrix, closest_neighbor, compute_K, compute_mean_R_0
 import scripts.svd as d
 
 '''
@@ -121,6 +120,4 @@ def main(QU1=False, QU2=True, QU3=False, QU4=False):
 
     #EndRegion
 
-    #print(d.svd_cross_validation(votes, 14, 5, True))
-
-main(False, False, True, False)
+main(False, True, False, False)
