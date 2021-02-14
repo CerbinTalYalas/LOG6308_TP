@@ -93,7 +93,3 @@ def dim_test(votes, dim_min, dim_max, n_folds=10, verbose=False):
     return dim, err, err_list
 
 #EndRegion
-
-def compar_matrix(votes, k, model):
-    v = train(votes, k)
-    return((model-v)**2)
