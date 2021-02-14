@@ -144,4 +144,4 @@ def main(QU1=False, QU2=True, QU3=True, QU4=False):
     # EndRegion
 
 
-main(False, True, False, False)
+main(True, True, True, True)
