@@ -15,7 +15,7 @@ from scripts.item_item import cos_matrix, closest_neighbor, votes_communs, nb_vo
 '''
 
 
-def main(QU1=False, QU2=True, QU3=False, QU4=False):
+def main(QU1=False, QU2=True, QU3=True, QU4=False):
     plt.ion()
 
     # Region[Blue] Init : read csv data
@@ -59,7 +59,7 @@ def main(QU1=False, QU2=True, QU3=False, QU4=False):
         plt.title("Q2.a. Distribution des similarités parmi les 10 voisins")
         plt.ylabel("Nombre d'occurence")
         plt.xlabel("Valeur de w")
-        plt.show(block=False)
+        plt.show(block=True)
 
         nb_0 = np.count_nonzero(w == 0)
         p_zeros = nb_0 / w.size
@@ -94,6 +94,7 @@ def main(QU1=False, QU2=True, QU3=False, QU4=False):
         plt.ylabel("Nombre d'occurence")
         plt.xlabel("Valeur de MSE")
         plt.show(block=True)
+        print("- - -")
 
     # EndRegion
 
