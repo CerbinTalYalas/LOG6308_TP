@@ -53,6 +53,16 @@ def main(QU1=False, QU2=True, QU3=False, QU4=False):
         ind = closest_neighbor(cos, 10)
         w = cos[np.arange(len(cos)), ind]
 
+        plt.hist(w.flatten(), bins=250)
+        plt.title("Q2.a. Distribution des similarités")
+        plt.ylabel("Nombre d'occurence")
+        plt.xlabel("Valeur de w")
+        plt.show()
+
+        nb_0 = np.count_nonzero(cos==0)
+        p_zeros = nb_0/cos.size
+        print("Q2.a. Proportion de poids nuls : " + str(p_zeros * 100)[:4] + " %")
+
         mean, R_0 = compute_mean_R_0(model)
         res = np.zeros(model.shape)
         for iid in range(1): #range(model.shape[1]):
