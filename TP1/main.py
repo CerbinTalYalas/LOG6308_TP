@@ -4,9 +4,10 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
 
 from scripts.cross_valid import cross_validation
-from scripts.item_item import cos_matrix, votes_communs, nb_voisins, compute_votes_manquants
+from scripts.item_item import cos_matrix, votes_communs, nb_voisins, compute_votes_manquants, predict
 from scripts.svd import dim_test
 from scripts.agglomeration import agglomeration
+from scripts.item_item_v2 import predict_i, cos_matrix, closest_neighbor, compute_K, compute_mean_R_0
 
 '''
 #######################################################################
@@ -14,7 +15,7 @@ from scripts.agglomeration import agglomeration
 #######################################################################
 '''
 
-def main(QU1=False, QU2=False, QU3=False, QU4=False):
+def main(QU1=False, QU2=True, QU3=False, QU4=False):
 
     # Region[Blue] Init : read csv data
 
@@ -46,7 +47,24 @@ def main(QU1=False, QU2=False, QU3=False, QU4=False):
     # Region[Cyan] Question 2
 
     if QU2:
-        cos_matrix = cos_matrix(model)
+        cos = cos_matrix(model)
+        ind = closest_neighbor(cos, 10)
+        w = cos[np.arange(len(cos)), ind]
+
+        mean, R_0 = compute_mean_R_0(model)
+        res = np.zeros(model.shape)
+        for iid in range(1): #range(model.shape[1]):
+            ind_i = ind[:, iid]
+            w_i = w[:, iid]
+            v_0_i = R_0[:, ind_i]
+            K_i = compute_K(v_0_i,w_i)
+            res[:,iid] = predict_i(mean[iid], K_i, v_0_i, w_i)
+
+
+
+        a = predict(0, 0, model, 10, cos)
+        b = 0
+        """cos_matrix = cos_matrix(model)
         triangular_cos = np.tril(cos_matrix)
 
         vote = vote_commun(model)
@@ -71,7 +89,7 @@ def main(QU1=False, QU2=False, QU3=False, QU4=False):
         plt.title("Q2.b. Distribution du nombre de voisin avec vote commun par item")
         plt.ylabel("Nombre d'occurence")
         plt.xlabel("Nombre de voisin")
-        plt.show()
+        plt.show()"""
 
     #EndRegion
 
@@ -97,6 +115,6 @@ def main(QU1=False, QU2=False, QU3=False, QU4=False):
 
     #EndRegion
 
-    print(compute_votes_manquants(votes, model))
-
+    res = compute_votes_manquants(votes, model)
+    a=0
 main()
