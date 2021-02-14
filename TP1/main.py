@@ -4,10 +4,9 @@ import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
 
 from scripts.cross_valid import cross_validation
-from scripts.svd import dim_test, svd_cross_validation
+from scripts.svd import dim_test
 from scripts.agglomeration import agglomeration
-from scripts.item_item import predict_i, cos_matrix, closest_neighbor, compute_K, compute_mean_R_0
-import scripts.svd as d
+from scripts.item_item import cos_matrix, closest_neighbor, votes_communs, nb_voisins, compute_error
 
 '''
 #######################################################################
@@ -15,8 +14,8 @@ import scripts.svd as d
 #######################################################################
 '''
 
-def main(QU1=False, QU2=True, QU3=False, QU4=False):
 
+def main(QU1=False, QU2=True, QU3=False, QU4=False):
     plt.ion()
 
     # Region[Blue] Init : read csv data
@@ -39,7 +38,8 @@ def main(QU1=False, QU2=True, QU3=False, QU4=False):
     # Region[Cyan] Question 1
 
     if QU1:
-        print("Q1. Calcul de la MSE de l'approche moyenne pour établir un seuil de comparaison (validation croisée, 10 replis)")
+        print(
+            "Q1. Calcul de la MSE de l'approche moyenne pour établir un seuil de comparaison (validation croisée, 10 replis)")
         result_q1 = cross_validation(votes, 10, False)
         print("Erreur quadratique moyenne : " + str(result_q1))
         print("- - -")
@@ -53,81 +53,79 @@ def main(QU1=False, QU2=True, QU3=False, QU4=False):
         ind = closest_neighbor(cos, 10)
         w = cos[np.arange(len(cos)), ind]
 
-        plt.hist(w.flatten(), bins=250)
-        plt.title("Q2.a. Distribution des similarités")
+        # Question 2.a.
+
+        plt.hist(w.flatten(), bins=250, color='cyan', edgecolor='black')
+        plt.title("Q2.a. Distribution des similarités parmi les 10 voisins")
         plt.ylabel("Nombre d'occurence")
         plt.xlabel("Valeur de w")
-        plt.show()
+        plt.show(block=False)
 
-        nb_0 = np.count_nonzero(cos==0)
-        p_zeros = nb_0/cos.size
-        print("Q2.a. Proportion de poids nuls : " + str(p_zeros * 100)[:4] + " %")
+        nb_0 = np.count_nonzero(w == 0)
+        p_zeros = nb_0 / w.size
+        print(
+            "Q2.a. Proportion moyenne de poids nuls parmi les 10 voisins d'un item : " + str(p_zeros * 100)[:4] + " %")
 
-        mean, R_0 = compute_mean_R_0(model)
-        res = np.zeros(model.shape)
-        for iid in range(1): #range(model.shape[1]):
-            ind_i = ind[:, iid]
-            w_i = w[:, iid]
-            v_0_i = R_0[:, ind_i]
-            K_i = compute_K(v_0_i,w_i)
-            res[:,iid] = predict_i(mean[iid], K_i, v_0_i, w_i)
+        nb_0_g = np.count_nonzero(cos == 0)
+        p_zeros_g = nb_0_g / cos.size
+        print("Q2.a. Proportion moyenne de poids nuls parmi tous les voisins d'un item : " + str(p_zeros_g * 100)[
+                                                                                             :4] + " %")
 
-        """cos_matrix = cos_matrix(model)
-        triangular_cos = np.tril(cos_matrix)
+        # Question 2.b.
 
         vote_comm = votes_communs(model)
         voisins = nb_voisins(vote_comm)
 
-        # Question 2.a.
-
-        plt.hist(triangular_cos[triangular_cos > 0], color='cyan', edgecolor='black', bins=250)
-        plt.title("Q2.a. Distribution des similarités")
-        plt.ylabel("Nombre d'occurence")
-        plt.xlabel("Valeur de cosinus")
-        plt.show(block=True)
-
-        p_zeros = 1 - np.count_nonzero(cos_mat) / (2 * n_items * (n_items + 1) / 2)
-        print("Q2.a. Proportion de poids nuls : " + str(p_zeros * 100)[:4] + " %")
-
-        # Question 2.b.
-
-        plt.hist(voisins, bins=168)
+        plt.hist(voisins, bins=168, color='cyan', edgecolor='black')
         plt.title("Q2.b. Distribution du nombre de voisin avec vote commun par item")
         plt.ylabel("Nombre d'occurence")
         plt.xlabel("Nombre de voisin")
-        plt.show(block=True)"""
+        plt.show(block=False)
 
-    #EndRegion
+        # Question 2.d.
+
+        err, mean_mse = compute_error(model, ind, w, votes)
+
+        print("Q2.d. L'erreur quadratique moyenne pour l'approche item-item est de : " + str(mean_mse))
+
+        plt.hist(err, bins=100, color='cyan', edgecolor='black')
+        plt.title("Q2.d. Distribution de l'erreur quadratique moyenne")
+        plt.ylabel("Nombre d'occurence")
+        plt.xlabel("Valeur de MSE")
+        plt.show(block=True)
+
+    # EndRegion
 
     # Region[Cyan] Question 3
-    
+
     if QU3:
         print("Q3. Choix des dimensions à garder pour SVD - on minimise l'erreur par cross-validation avec 5 replis")
 
         dim_min, dim_max = 5, 20
         dim, err, err_list = dim_test(votes, dim_min, dim_max)
 
-        plt.plot(range(dim_min, dim_max+1), err_list,'d-r')
+        plt.plot(range(dim_min, dim_max + 1), err_list, 'd-r')
         plt.title("Erreur quadratique moyenne de l'approche SVD pour différents choix de dimensions")
         plt.ylabel("MSE")
         plt.xlabel("k")
         plt.show(block=True)
-        
-        print("On choisit de garder "+str(dim)+" dimensions, et on a alors une erreur de "+str(err))
+
+        print("On choisit de garder " + str(dim) + " dimensions, et on a alors une erreur de " + str(err))
         print("- - -")
 
-    #EndRegion
+    # EndRegion
 
     # Region[Cyan] Question 4
 
     if QU4:
         print("Q4. Calcul de MSE pour différentes tailles de classes pour l'approche par agglomération")
-        cluster_size = [5,10,20,40,80]
+        cluster_size = [5, 10, 20, 40, 80]
         for size in cluster_size:
             err = agglomeration(votes, 5, size)
             print("La MSE avec 5 replis et " + str(size) + " clusters est de " + str(err))
         print("- - -")
 
-    #EndRegion
+    # EndRegion
+
 
 main(False, True, False, False)

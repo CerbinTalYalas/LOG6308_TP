@@ -8,6 +8,7 @@ import math
 from scipy.sparse import csr_matrix
 from sklearn.cluster import KMeans
 
+
 # Region[Red] K-fold
 
 def k_fold(nb_fold, data):
@@ -20,10 +21,11 @@ def k_fold(nb_fold, data):
         start = end
         end = len(data) if (i + 1 == nb_fold - 1) else end + item_per_fold
     return folds
-    
+
+
 # EndRegion
 
-#Region[Green] Clustering
+# Region[Green] Clustering
 
 def train_test_spit(test_index, folds):
     test = folds[test_index]
@@ -56,7 +58,7 @@ def fill_missing(data):
     avg_i = mean_without_zero(data, axis=0)
     for uid, user in enumerate(data):
         for iid, item in enumerate(user):
-            if item == 0 :
+            if item == 0:
                 val = 0
                 div = 0
                 if not np.isnan(avg_u[uid]):
@@ -94,7 +96,8 @@ def agglomeration(data, n_folds, n_cluster):
 
     for i in range(n_folds):
         train_set_pd, test_set_pd = train_test_spit(i, folds)
-        train_set_np = csr_matrix((train_set_pd['rating'], (train_set_pd['user.id'], train_set_pd['item.id']))).toarray()
+        train_set_np = csr_matrix(
+            (train_set_pd['rating'], (train_set_pd['user.id'], train_set_pd['item.id']))).toarray()
         random_n = NormalDist(0, 1e-4).samples(train_set_np.size, seed=0)
         random_n = np.reshape(random_n, train_set_np.shape)
 
@@ -112,4 +115,4 @@ def agglomeration(data, n_folds, n_cluster):
 
     return np.mean(err)
 
-#EndRegion
+# EndRegion
