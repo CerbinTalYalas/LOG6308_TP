@@ -20,7 +20,7 @@ def getCitation(id, collection):
     return('<li>' + ''.join(getAuthors(cit)) + ', (' + getDate(cit) + '). ' + '<a href="' + str(id).lstrip('0') + '">' + str(id).lstrip('0') + ":" +  cit['dc:title'] + '</a>')
 
 def getAuthors(Record):
-    if(not 'author' not in Record):
+    if(not 'author' in Record):
         return('')
     if(type(Record['author']) is dict):
         return(Record['author']['name'])
