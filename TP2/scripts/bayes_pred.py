@@ -2,21 +2,9 @@ import pandas as pd
 import numpy as np
 import os
 import heapq
+import time
 import matplotlib.pyplot as plt
 from scipy.sparse import csr_matrix
-
-users = pd.read_csv("./data/u.csv", sep="|")
-n_users = len(users)
-users['id '] -= 1
-items = pd.read_csv("./data/items.csv", sep="|")
-n_items = len(items)
-items['movie id '] -= 1
-votes = pd.read_csv("./data/votes.csv", sep="|")
-n_votes = len(votes)
-votes['user.id'] -= 1
-votes['item.id'] -= 1
-
-model = csr_matrix((votes['rating'], (votes['user.id'], votes['item.id']))).toarray()
 
 #Region[Yellow] Classifying functions
 
@@ -143,18 +131,6 @@ def compute_odd_ratio(item_id, features, dfs):
     odd = (o_h*ls_job*ls_gender*ls_age_group)
     return odd
 
-def get_k_fav_item(items, features, dfs, k=10):
-    topk = []
-    for _, item in items.iterrows():
-        odd = compute_odd_ratio(item['movie id '], features, dfs)
-        heapq.heappush(topk, (odd, item))
-        topk = heapq.nlargest(k, topk)
-    return topk
-
-#EndRegion
-
-#Region[Red]
-
 def compute_average_votes(model):
     like_ratings = []
     for item in model.T:
@@ -171,11 +147,25 @@ def compute_average_votes(model):
         like_ratings.append((mr_likes, mr_dislikes))
     return like_ratings
 
-def compute_error(model, votes, users):
+#EndRegion
+
+#Region[Red]
+
+def get_k_fav_item(features, items, votes, users, k=10, read_from_csv=True):
+    topk = []
+    dfs = gen_dataframes(votes, users, read_from_csv)
+    for _, item in items.iterrows():
+        odd = compute_odd_ratio(item['movie id '], features, dfs)
+        heapq.heappush(topk, (odd, item))
+        topk = heapq.nlargest(k, topk)
+    return topk
+
+def compute_error(model, votes, users, avg_votes = None, read_from_csv=True):
 
     errors = []
-    avg_votes = compute_average_votes(model)
-    dfs = gen_dataframes(votes, users, read_from_csv=True)
+    if avg_votes is None:
+        avg_votes = compute_average_votes(model)
+    dfs = gen_dataframes(votes, users, read_from_csv)
 
     for _, vote in votes.iterrows():
         uid, iid = vote['user.id'], vote['item.id']
@@ -188,11 +178,5 @@ def compute_error(model, votes, users):
 
     mse = np.mean(errors)
     return mse
-
-#EndRegion
-
-#Region[Magenta] Run
-
-print(compute_error(model, votes, users))
 
 #EndRegion
