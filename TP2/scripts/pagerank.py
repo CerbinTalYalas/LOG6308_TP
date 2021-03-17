@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-adjacent = pd.read_table("./citeseer.rtable", sep=" ")
+adjacent = pd.read_table("../data/citeseer.rtable", sep=" ")
 
 adjacent.columns = adjacent.columns.astype('int64')
 np.fill_diagonal(adjacent.values, 0)
@@ -43,6 +43,7 @@ pagerank = compute_pagerank(adjacent)
 result1 = get_top_pagerank(doc, adjacent, pagerank)
 print(result1)
 
+# extend space
 adjacent2 = adjacent + adjacent.dot(adjacent)
 result2 = get_top_pagerank(doc, adjacent2, pagerank)
 print(result2)

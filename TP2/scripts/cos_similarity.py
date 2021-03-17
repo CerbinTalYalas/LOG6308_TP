@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
 
-adjacent = pd.read_table("./citeseer.rtable", sep=" ")
-np.fill_diagonal(adjacent.values, 1)  # avoid divide by 0 in cos
-
+adjacent = pd.read_table("../data/citeseer.rtable", sep=" ")
 
 def cos_matrix(A):
     # code from (https://stackoverflow.com/a/20687984)
@@ -31,10 +29,10 @@ def cos_matrix(A):
 
 
 def compute_cos_similarity(adjacent, top_n=10):
-    cos = cos_matrix(adjacent)
+    cos = cos_matrix(adjacent.values)
     # remove diagonal to don't recommend it self
     np.fill_diagonal(cos, 0)
-    result = pd.DataFrame(adjacent.columns.to_numpy()[cos.argsort(1)[:, :-top_n:-1]], index=adjacent.index)
+    result = pd.DataFrame(adjacent.index.to_numpy()[cos.argsort(1)[:, :-(top_n+1):-1]], index=adjacent.index)
     result = result.rename(columns=lambda x: 'Top_{}'.format(x + 1))
     return result
 
@@ -45,4 +43,4 @@ def get_doc_recommendation(cos_similarity_result, id):
 
 all_result = compute_cos_similarity(adjacent)
 
-doc_10563 = get_doc_recommendation(all_result, 10563)
+doc_422908 = get_doc_recommendation(all_result, 422908)
