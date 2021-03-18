@@ -1,16 +1,6 @@
 import pandas as pd
 import numpy as np
 
-<<<<<<< Updated upstream
-adjacent = pd.read_table("../data/citeseer.rtable", sep=" ")
-
-adjacent.columns = adjacent.columns.astype('int64')
-np.fill_diagonal(adjacent.values, 0)
-doc = 422908
-
-
-=======
->>>>>>> Stashed changes
 def compute_pagerank(adjacent, d=0.85):
     adjacent_temp = adjacent.copy()
     np.fill_diagonal(adjacent_temp.values, 1)
@@ -39,18 +29,4 @@ def get_top_pagerank(doc, adjacent, pagerank):
     result = local_pagerank[local_pagerank>0]
     result.sort_values(ascending=False, inplace=True)
     #top_page = local_pagerank.nlargest(top)
-<<<<<<< Updated upstream
     return result
-
-
-pagerank = compute_pagerank(adjacent)
-result1 = get_top_pagerank(doc, adjacent, pagerank)
-print(result1)
-
-# extend space
-adjacent2 = adjacent + adjacent.dot(adjacent)
-result2 = get_top_pagerank(doc, adjacent2, pagerank)
-print(result2)
-=======
-    return result
->>>>>>> Stashed changes
