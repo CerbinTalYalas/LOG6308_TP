@@ -29,7 +29,7 @@ model = csr_matrix((votes['rating'], (votes['user.id'], votes['item.id']))).toar
 
 adjacent = pd.read_table("./data/citeseer.rtable", sep=" ")
 adjacent.columns = adjacent.columns.astype('int64')
-np.fill_diagonal(adjacent.values, 0)
+# np.fill_diagonal(adjacent.values, 0)
 pagerank = compute_pagerank(adjacent)
 
 # EndRegion
@@ -78,4 +78,4 @@ def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
 
 #EndRegion
 
-main(True, False, False, False, False)
+main(False, False, True, False, False)
