@@ -7,7 +7,7 @@ def compute_pagerank(adjacent, d=0.85):
     adjacent_temp[adjacent_temp > 1] = 1
 
     n = adjacent_temp.shape[0]
-    r = pd.Series(1, index=adjacent_temp.index)
+    r = pd.Series(1/n, index=adjacent_temp.index)
     s = adjacent_temp.sum(axis=1)
     adjacent_t = adjacent_temp.transpose()
 

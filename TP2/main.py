@@ -59,23 +59,23 @@ def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
         result1 = get_top_pagerank(doc, adjacent, pagerank)
         print("Lectures recommandées après la lecture "+str(doc)+" - approche de base")
         for iid, score in result1.iteritems():
-            print("|  Id : "+str(iid)+" - Score : "+str(score)[0:7])
+            print("|  Id : "+str(iid)+" - Pagerank : "+str(score)[0:7])
         print("- - -")
         adjacent_ext = adjacent + adjacent.dot(adjacent)
         result2 = get_top_pagerank(doc, adjacent_ext, pagerank)
-        print("Lectures recommandées après la lecture "+str(doc)+" - approche de base")
+        print("Lectures recommandées après la lecture "+str(doc)+" - voisinage étendu")
         for iid, score in result2.iteritems():
-            print("|  Id : "+str(iid)+" - Score : "+str(score)[0:7])
+            print("|  Id : "+str(iid)+" - Pagerank : "+str(score)[0:7])
 
     if Q3:
         print("\n ### QUESTION 3 ###\n")
         all_result = compute_cos_similarity(adjacent)
         print("10 articles les plus similaires à l'article "+str(doc)+" :")
-        doc_10563 = get_doc_recommendation(all_result, doc)
-        for rank, iid in doc_10563.iteritems():
+        reco = get_doc_recommendation(all_result, doc)
+        for rank, iid in reco.iteritems():
             print("| Id : "+str(iid)+" - Classement : "+str(rank))
 
 
 #EndRegion
 
-main(False, True, True, False, False)
+main(True, False, False, False, False)

@@ -1,11 +1,6 @@
 import pandas as pd
 import numpy as np
 
-<<<<<<< Updated upstream
-adjacent = pd.read_table("../data/citeseer.rtable", sep=" ")
-=======
->>>>>>> Stashed changes
-
 def cos_matrix(A):
     # code from (https://stackoverflow.com/a/20687984)
     # base similarity matrix (all dot products)
