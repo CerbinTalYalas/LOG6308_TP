@@ -1,7 +1,10 @@
 import pandas as pd
 import numpy as np
 
+<<<<<<< Updated upstream
 adjacent = pd.read_table("../data/citeseer.rtable", sep=" ")
+=======
+>>>>>>> Stashed changes
 
 def cos_matrix(A):
     # code from (https://stackoverflow.com/a/20687984)
@@ -32,15 +35,23 @@ def compute_cos_similarity(adjacent, top_n=10):
     cos = cos_matrix(adjacent.values)
     # remove diagonal to don't recommend it self
     np.fill_diagonal(cos, 0)
+<<<<<<< Updated upstream
     result = pd.DataFrame(adjacent.index.to_numpy()[cos.argsort(1)[:, :-(top_n+1):-1]], index=adjacent.index)
+=======
+    result = pd.DataFrame(adjacent.columns.to_numpy()[cos.argsort(1)[:, :-top_n-1:-1]], index=adjacent.index)
+>>>>>>> Stashed changes
     result = result.rename(columns=lambda x: 'Top_{}'.format(x + 1))
     return result
 
 
 def get_doc_recommendation(cos_similarity_result, id):
+<<<<<<< Updated upstream
     return cos_similarity_result.loc[id]
 
 
 all_result = compute_cos_similarity(adjacent)
 
 doc_422908 = get_doc_recommendation(all_result, 422908)
+=======
+    return cos_similarity_result.loc[id]
+>>>>>>> Stashed changes
