@@ -35,7 +35,7 @@ def main(Q1=True, Q2=True, Q3=False, Q4=False, Q5=False):
         for entry in topk:
             rating, iid = entry
             film = items.iloc[iid]
-            print("| "+str(film[' movie title '])+" - Note prédite : "+str(rating)[0:4])
+            print("| "+str(film[' movie title '])+" - Note prédite : "+str(rating)[0:5])
         print("- - -")
         pred = compute_predictions(model, votes, users, items)
         mse = process_error(model, pred)
