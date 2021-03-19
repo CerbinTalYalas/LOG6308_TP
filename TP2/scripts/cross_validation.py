@@ -27,9 +27,9 @@ def gen_sets(adjacent, k=10):
         sets.append((df_train, df_test))
     return sets
 
-def fn_taux_rappel(df_test, recommandations):
+def fn_taux_rappel(df_adjacence_test, recommandations):
 
-    mx_test = df_test.values.astype(bool)
+    mx_test = df_adjacence_test.values.astype(bool)
     mx_reco = recommandations.values.astype(bool)
 
     recall = mx_test & mx_reco # Link is in test set AND is predicted
@@ -38,16 +38,16 @@ def fn_taux_rappel(df_test, recommandations):
 
     return recall_rate
 
-def tx_rappel_total(adjacent, n=5, training_func):
+def tx_rappel_total(df_adjacence, n=5, training_func):
     
     recall_mx = []
 
     for _ in range(n):
         exp = []
-        sets = gen_sets(adjacent)
-        for train, test in sets:
-            reco = training_func(train)
-            recall = fn_taux_rappel(test, reco)
+        sets = gen_sets(df_adjacence)
+        for df_adjacence_entrainement, df_adjacence_test in sets:
+            recommandations = training_func(df_adjacence_entrainement)
+            recall = fn_taux_rappel(df_adjacence_test, recommandations)
             exp.append(recall)
         recall_mx.append(exp)
 
