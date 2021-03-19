@@ -60,26 +60,28 @@ def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
         print("\n ### QUESTION 2 ###\n")
         doc = 422908
 
+        print("Lecture "+str(doc)+" : "+str(abstract[abstract['Id'] == doc].iloc[0]['Titre'])+"\n")
+
         result1 = get_top_pagerank(doc, adjacent, pagerank)
         print("Lectures recommandées après la lecture "+str(doc)+" - approche de base")
         for iid, score in result1.iteritems():
-            print("|  Id : "+str(iid)+" - Pagerank : "+str(score)[0:7])
+            print("| "+str(abstract[abstract['Id'] == iid].iloc[0]['Titre'])+" - Id : "+str(iid)+"\n| \tPagerank : "+str(score)[0:7]+"\n|")
         print("- - -")
         adjacent_ext = adjacent + adjacent.dot(adjacent)
         result2 = get_top_pagerank(doc, adjacent_ext, pagerank)
         print("Lectures recommandées après la lecture "+str(doc)+" - voisinage étendu")
         for iid, score in result2.iteritems():
-            print("|  Id : "+str(iid)+" - Pagerank : "+str(score)[0:7])
+            print("|  "+str(abstract[abstract['Id'] == iid].iloc[0]['Titre'])+" - Id : "+str(iid)+"\n| \tPagerank : "+str(score)[0:7]+"\n|")
 
     if Q3:
         print("\n ### QUESTION 3 ###\n")
         doc = 422908
 
         all_result = compute_cos_similarity(adjacent)
-        print("10 articles les plus similaires à l'article "+str(doc)+" :")
+        print("10 articles les plus similaires à l'article "+str(doc)+" : "+str(abstract[abstract['Id'] == doc].iloc[0]['Titre'])+"\n")
         reco = get_doc_recommendation(all_result, doc)
         for rank, iid in reco.iteritems():
-            print("| Id : "+str(iid)+" - Classement : "+str(rank))
+            print("|  "+str(abstract[abstract['Id'] == iid].iloc[0]['Titre'])+" - Id : "+str(iid)+"\n| \tClassement : "+str(rank)+"\n|")
 
     if Q4:
         print("\n ### QUESTION 4 ###\n")
@@ -87,10 +89,10 @@ def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
 
         abstract_q4 = abstract.copy().dropna()
         tfidf_result = compute_tfidf_recommandation(abstract_q4)
-        print("10 articles les plus similaires à l'article " + str(doc) + " :")
+        print("10 articles les plus similaires à l'article "+str(doc)+" : "+str(abstract[abstract['Id'] == doc].iloc[0]['Titre'])+"\n")
         doc_422908 = get_doc_recommendation(tfidf_result, 422908)
         for rank, iid in doc_422908.iteritems():
-            print("| Id : "+str(iid)+" - Classement : "+str(rank))
+            print("|  "+str(abstract[abstract['Id'] == iid].iloc[0]['Titre'])+" - Id : "+str(iid)+"\n| \tClassement : "+str(rank)+"\n|")
 
 
 #EndRegion
