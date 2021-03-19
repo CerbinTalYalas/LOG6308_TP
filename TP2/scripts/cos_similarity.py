@@ -11,7 +11,8 @@ def cos_matrix(A):
     square_mag = np.diag(similarity)
 
     # inverse squared magnitude
-    inv_square_mag = 1 / square_mag
+    with np.errstate(divide='ignore'):
+        inv_square_mag = 1 / square_mag
 
     # if it doesn't occur, set it's inverse magnitude to zero (instead of inf)
     inv_square_mag[np.isinf(inv_square_mag)] = 0

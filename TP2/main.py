@@ -7,6 +7,7 @@ import time
 from scripts.mx_bayes_pred import compute_predictions, process_error, get_k_fav_item
 from scripts.pagerank import compute_pagerank, get_top_pagerank
 from scripts.cos_similarity import compute_cos_similarity, get_doc_recommendation
+from scripts.content_based import compute_tfidf_recommandation
 
 # Region[Blue] Init : read csv data
 
@@ -29,13 +30,16 @@ model = csr_matrix((votes['rating'], (votes['user.id'], votes['item.id']))).toar
 
 adjacent = pd.read_table("./data/citeseer.rtable", sep=" ")
 adjacent.columns = adjacent.columns.astype('int64')
-# np.fill_diagonal(adjacent.values, 0)
+
 pagerank = compute_pagerank(adjacent)
+
+abstract = pd.read_table("./data/abstracts.csv", sep=",")
+abstract.drop(abstract.columns[0], axis=1, inplace=True)
+
 
 # EndRegion
 
 def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
-
 #Region[Yellow] Q1
 
     if Q1:
@@ -69,13 +73,26 @@ def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
 
     if Q3:
         print("\n ### QUESTION 3 ###\n")
+        doc = 422908
+
         all_result = compute_cos_similarity(adjacent)
         print("10 articles les plus similaires à l'article "+str(doc)+" :")
         doc_10563 = get_doc_recommendation(all_result, doc)
         for rank, iid in doc_10563.iteritems():
             print("| Id : "+str(iid)+" - Classement : "+str(rank))
 
+    if Q4:
+        print("\n ### QUESTION 4 ###\n")
+        doc = 422908
+
+        abstract_q4 = abstract.copy().dropna()
+        tfidf_result = compute_tfidf_recommandation(abstract_q4)
+        print("10 articles les plus similaires à l'article " + str(doc) + " :")
+        doc_422908 = get_doc_recommendation(tfidf_result, 422908)
+        for rank, iid in doc_422908.iteritems():
+            print("| Id : "+str(iid)+" - Classement : "+str(rank))
+
 
 #EndRegion
 
-main(False, False, True, False, False)
+main(False, False, False, True, False)
