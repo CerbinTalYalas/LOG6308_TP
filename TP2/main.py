@@ -8,7 +8,8 @@ from scripts.mx_bayes_pred import compute_predictions, process_error, get_k_fav_
 from scripts.pagerank import compute_pagerank, get_top_pagerank, get_doc_top_pagerank
 from scripts.cos_similarity import compute_cos_similarity, get_doc_recommendation
 from scripts.content_based import compute_tfidf_recommandation
-
+from scripts.cross_validation import tx_rappel_total
+from scripts.recommandation_gen import fn_recommandations
 # Region[Blue] Init : read csv data
 
 
@@ -94,7 +95,15 @@ def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
         for rank, iid in doc_422908.iteritems():
             print("|  "+str(abstract[abstract['Id'] == iid].iloc[0]['Titre'])+" - Id : "+str(iid)+"\n| \tClassement : "+str(rank)+"\n|")
 
+    if Q5:
+        print("\n ### QUESTION 5 ###\n")
+
+        start = time.time()
+        result = tx_rappel_total(adjacent, abstract, fn_recommandations)
+        print("Taux de rappel moyen avec 10 folds et 5 expérience : {:.2f}%".format(result*100))
+        print("%s secondes " % (time.time() - start))
+
 
 #EndRegion
 
-main(True, False, False, True, False)
+main(True, True, True, True, True)

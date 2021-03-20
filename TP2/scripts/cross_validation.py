@@ -1,20 +1,11 @@
 import pandas as pd
 import numpy as np
 import random
-from recommandation_gen import gen_recommandation
-
-adjacent = pd.read_table("../data/citeseer.rtable", sep=" ")
-adjacent.columns = adjacent.columns.astype('int64')
-
-abstract = pd.read_table("../data/abstracts.csv", sep=",")
-abstract.drop(abstract.columns[0], axis=1, inplace=True)
 
 
 def gen_sets(adjacent, k=10):
-    p = 1 / k
     adjacent_values = adjacent.values
     l, c = np.where(adjacent_values == 1)
-    train_matrix = np.ndarray.copy(adjacent_values)
     i = len(l)
     sets = []
     test_indexes = list(range(i))
@@ -43,19 +34,44 @@ def fn_taux_rappel(df_adjacence_test, recommandations):
     return recall_rate
 
 
-def tx_rappel_total(df_adjacence, abstract, training_func, n=5):
+def tx_rappel_total(df_adjacence, abstract, fn_recommandations, n=5):
     recall_mx = []
-
+    printProgressBar(0, 50, prefix='Progress:', suffix='Complete', length=50)
+    i = 0
     for _ in range(n):
         exp = []
         sets = gen_sets(df_adjacence)
         for df_adjacence_entrainement, df_adjacence_test in sets:
-            recommandations = training_func(df_adjacence_entrainement, abstract)
+            recommandations = fn_recommandations(df_adjacence_entrainement, abstract)
             recall = fn_taux_rappel(df_adjacence_test, recommandations)
             exp.append(recall)
+
+            i += 1
+            printProgressBar(i, n*10, prefix='Progress:', suffix='Complete', length=50)
         recall_mx.append(exp)
 
     return np.mean(recall_mx)
 
-result = tx_rappel_total(adjacent, abstract, gen_recommandation)
-print(result)
+
+# Code from : https://stackoverflow.com/questions/3173320/text-progress-bar-in-the-console
+# Print iterations progress
+def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=100, fill='█', printEnd="\r"):
+    """
+    Call in a loop to create terminal progress bar
+    @params:
+        iteration   - Required  : current iteration (Int)
+        total       - Required  : total iterations (Int)
+        prefix      - Optional  : prefix string (Str)
+        suffix      - Optional  : suffix string (Str)
+        decimals    - Optional  : positive number of decimals in percent complete (Int)
+        length      - Optional  : character length of bar (Int)
+        fill        - Optional  : bar fill character (Str)
+        printEnd    - Optional  : end character (e.g. "\r", "\r\n") (Str)
+    """
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filledLength = int(length * iteration // total)
+    bar = fill * filledLength + '-' * (length - filledLength)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end=printEnd)
+    # Print New Line on Complete
+    if iteration == total:
+        print()

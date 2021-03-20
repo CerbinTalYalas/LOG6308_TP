@@ -36,5 +36,16 @@ def compute_cos_similarity(adjacent, top_n=10):
     return result
 
 
+def compute_cos_similarity_full(adjacent, index, top_n=10):
+    cos = cos_matrix(adjacent.values)
+    np.fill_diagonal(cos, 0)
+    best_cos = cos.argsort(1)[:, :-(top_n + 1):-1]
+    result = pd.DataFrame(0, index=index, columns=index)
+    for i, val in enumerate(best_cos):
+        result.iloc[i, val] = 1
+
+    return result
+
+
 def get_doc_recommendation(cos_similarity_result, id):
     return cos_similarity_result.loc[id]
