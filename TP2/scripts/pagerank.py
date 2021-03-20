@@ -23,11 +23,18 @@ def compute_pagerank(adjacent, d=0.85, e=1e-6):
     return r
 
 
-def get_top_pagerank(doc, adjacent, pagerank):
-    doc_ref = adjacent.loc[doc]
+def get_doc_top_pagerank(doc, adjacent, pagerank, top_n=10):
     adjacent[adjacent > 1] = 1
+    doc_ref = adjacent.loc[doc]
     local_pagerank = doc_ref * pagerank
     result = local_pagerank[local_pagerank > 0]
-    result.sort_values(ascending=False, inplace=True)
-    # top_page = local_pagerank.nlargest(top)
+    result = result.nlargest(top_n)
     return result
+
+def get_top_pagerank(adjacent, pagerank, top_n=10):
+    adjacent_copy = adjacent.copy()
+    #adjacent_copy[adjacent_copy > 1] = 1
+    adjacent_pagerank = adjacent * pagerank
+    result = adjacent_pagerank.apply(lambda s, n: pd.Series(s.nlargest(n).index), axis=1, n=top_n)
+    return result
+

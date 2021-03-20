@@ -5,7 +5,7 @@ from scipy.sparse import csr_matrix
 import time
 
 from scripts.mx_bayes_pred import compute_predictions, process_error, get_k_fav_item
-from scripts.pagerank import compute_pagerank, get_top_pagerank
+from scripts.pagerank import compute_pagerank, get_top_pagerank, get_doc_top_pagerank
 from scripts.cos_similarity import compute_cos_similarity, get_doc_recommendation
 from scripts.content_based import compute_tfidf_recommandation
 
@@ -61,8 +61,8 @@ def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
         doc = 422908
 
         print("Lecture "+str(doc)+" : "+str(abstract[abstract['Id'] == doc].iloc[0]['Titre'])+"\n")
-
-        result1 = get_top_pagerank(doc, adjacent, pagerank)
+        result0 = get_top_pagerank(adjacent,pagerank)
+        result1 = get_doc_top_pagerank(doc, adjacent, pagerank)
         print("Lectures recommandées après la lecture "+str(doc)+" - approche de base")
         for iid, score in result1.iteritems():
             print("| "+str(abstract[abstract['Id'] == iid].iloc[0]['Titre'])+" - Id : "+str(iid)+"\n| \tPagerank : "+str(score)[0:7]+"\n|")
@@ -97,4 +97,4 @@ def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
 
 #EndRegion
 
-main(False, False, False, True, False)
+main(False, True, False, False, False)
