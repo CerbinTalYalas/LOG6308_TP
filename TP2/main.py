@@ -68,7 +68,7 @@ def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
             print("| "+str(abstract[abstract['Id'] == iid].iloc[0]['Titre'])+" - Id : "+str(iid)+"\n| \tPagerank : "+str(score)[0:7]+"\n|")
         print("- - -")
         adjacent_ext = adjacent + adjacent.dot(adjacent)
-        result2 = get_top_pagerank(doc, adjacent_ext, pagerank)
+        result2 = get_doc_top_pagerank(doc, adjacent_ext, pagerank)
         print("Lectures recommandées après la lecture "+str(doc)+" - voisinage étendu")
         for iid, score in result2.iteritems():
             print("|  "+str(abstract[abstract['Id'] == iid].iloc[0]['Titre'])+" - Id : "+str(iid)+"\n| \tPagerank : "+str(score)[0:7]+"\n|")
