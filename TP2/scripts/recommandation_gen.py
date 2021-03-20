@@ -32,8 +32,8 @@ def dense_to_full(dataframe):
 
     return result
 
-def gen_recommandation(adjacent, abstratc):
-    recommandation_tfidf = compute_tfidf_recommandation(abstratc, top_n= 20).astype('Int64')
+def gen_recommandation(adjacent, abstract):
+    recommandation_tfidf = compute_tfidf_recommandation(abstract, top_n= 20).astype('Int64')
     recommandation_cos = compute_cos_similarity(adjacent, top_n=20)
 
     joined_recomandation = recommandation_cos.join(recommandation_tfidf, lsuffix="_cos", rsuffix="_tfidf")
