@@ -63,13 +63,13 @@ def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
         print("Lecture "+str(doc)+" : "+str(abstract[abstract['Id'] == doc].iloc[0]['Titre'])+"\n")
         result0 = get_top_pagerank(adjacent,pagerank)
         result1 = get_doc_top_pagerank(doc, adjacent, pagerank)
-        print("Lectures recommandées après la lecture "+str(doc)+" - approche de base")
+        print("\nLectures recommandées après la lecture "+str(doc)+" - approche de base")
         for iid, score in result1.iteritems():
             print("| "+str(abstract[abstract['Id'] == iid].iloc[0]['Titre'])+" - Id : "+str(iid)+"\n| \tPagerank : "+str(score)[0:7]+"\n|")
-        print("- - -")
+        print("\n- - -\n")
         adjacent_ext = adjacent + adjacent.dot(adjacent)
         result2 = get_doc_top_pagerank(doc, adjacent_ext, pagerank)
-        print("Lectures recommandées après la lecture "+str(doc)+" - voisinage étendu")
+        print("\nLectures recommandées après la lecture "+str(doc)+" - voisinage étendu")
         for iid, score in result2.iteritems():
             print("|  "+str(abstract[abstract['Id'] == iid].iloc[0]['Titre'])+" - Id : "+str(iid)+"\n| \tPagerank : "+str(score)[0:7]+"\n|")
 
@@ -97,4 +97,4 @@ def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
 
 #EndRegion
 
-main(False, True, False, False, False)
+main(True, False, False, True, False)
