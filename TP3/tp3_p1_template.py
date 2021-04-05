@@ -122,20 +122,50 @@ cached_test = test.batch(test_batch_size).cache()
 
 #Question 7 : Entraînez le modèle avec model.fit jusqu’à ce qu’il surpasse de 40% la métrique top_100_categorical_top_k pour l’entraînement. Après combien d’epochs cela survient-t-il?
 
+top_100_categorical_top_k = 0
+epoch = 0
+loss = []
+train_top_100 = []
+test_top_100 = []
+while top_100_categorical_top_k < 0.4:
+    result = model.fit(cached_train, epochs=1)
+    epoch += 1
+    top_100_categorical_top_k = result.history['factorized_top_k/top_100_categorical_accuracy'][0]
+    train_top_100.append(top_100_categorical_top_k)
+    loss.append(result.history['total_loss'][0])
 
-"""
+    test_top_100.append(model.evaluate(cached_test, return_dict=True)['factorized_top_k/top_100_categorical_accuracy'])
+
+print(epoch)
+
+
 #Question 8 : Si on obtenait des données d'entraînement supplémentaires dans le futur, devrait-on recommencer l'entraînement du modèle sur l'ensemble du corpus augmenté des nouvelles données ? 
 #Si oui, pourquoi ? Si non, comment devrait-on s'y prendre ? 
 #Réponse: Répondez ICI
 
 #Question 9 : Tracez le graphique du loss total d'entraînement en fonction des epochs
+plt.plot(loss, marker='o')
+plt.xticks(range(epoch), np.arange(1, epoch+1, 1))
+plt.title("Loss total en fonction des epochs")
+plt.xlabel("Epoch")
+plt.ylabel("Loss total")
+plt.grid(color='0.95')
+plt.show()
 
+#Question 10 : Tracez, sur un même graphique, l'évolution de la métrique top_100_categorical_top_k en fonction des epochs pour l'entraînement et le test.
 
-#Question 10 : Tracez, sur un même graphique, l'évolution de la métrique top_100_categorical_top_k en fonction des epochs pour l'entraînement et le test. 
+plt.plot(train_top_100, marker='o')
+plt.plot(test_top_100, marker='s')
+plt.xticks(range(epoch), np.arange(1, epoch+1, 1))
+plt.title("Evolution de top_100_categorical_top_k en fonction des epochs")
+plt.xlabel("Epoch")
+plt.ylabel("top_100_categorical_top_k")
+plt.grid(color='0.95')
+plt.show()
 #Question 11 : Pourquoi la performance sur les données de test est inférieure à celle sur les données d'entraînement (1 raison)? 
 #Question 12 : Est-ce que ces courbes représentent un résultat attendu pour un réseau de neuronne classique ? Pourquoi ? Développez. 
  
-
+"""
 #Recommandez les 5 meilleurs films pour l'utilisateur 25
 
 index = tfrs.layers.factorized_top_k.BruteForce($modèle utilisateur entraîné$)
