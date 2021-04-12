@@ -30,7 +30,7 @@ films = tfds.load("movielens/100k-movies", split="train")
 #Pour votes, gardez les attributs "movie_title" et "user_id"
 #Pour films, gardez les attributs "movie_title     
 
-votes = votes.map(lambda x: {"movie_title": x["movie_title"], "user_id": x["user_id"],})
+votes = votes.map(lambda x: {"movie_title": x["movie_title"], "user_id": x["user_id"]})
 
 films = films.map(lambda x: x["movie_title"])
 
@@ -154,25 +154,25 @@ plt.show()
 
 #Question 10 : Tracez, sur un même graphique, l'évolution de la métrique top_100_categorical_top_k en fonction des epochs pour l'entraînement et le test.
 
-plt.plot(train_top_100, marker='o')
-plt.plot(test_top_100, marker='s')
+plt.plot(train_top_100, marker='o', label="entrainement")
+plt.plot(test_top_100, marker='s', label="test")
 plt.xticks(range(epoch), np.arange(1, epoch+1, 1))
 plt.title("Evolution de top_100_categorical_top_k en fonction des epochs")
 plt.xlabel("Epoch")
 plt.ylabel("top_100_categorical_top_k")
 plt.grid(color='0.95')
+plt.legend(loc='upper left')
 plt.show()
 #Question 11 : Pourquoi la performance sur les données de test est inférieure à celle sur les données d'entraînement (1 raison)? 
 #Question 12 : Est-ce que ces courbes représentent un résultat attendu pour un réseau de neuronne classique ? Pourquoi ? Développez. 
  
-"""
+
 #Recommandez les 5 meilleurs films pour l'utilisateur 25
 
-index = tfrs.layers.factorized_top_k.BruteForce($modèle utilisateur entraîné$)
+index = tfrs.layers.factorized_top_k.BruteForce(model.user_model)
 
-index.index(films.batch(100).map($modèle film entraîné$), films)
+index.index(films.batch(100).map(model.film_model), films)
 
 
-_, titles = index(tf.constant([$user_id$]))
-print()
-"""
+_, titles = index(tf.constant(["25"]))
+print(f"Recommendations for user 42: {titles[0, :5]}")
