@@ -10,6 +10,7 @@ from scripts.cos_similarity import compute_cos_similarity, get_doc_recommendatio
 from scripts.content_based import compute_tfidf_recommandation
 from scripts.cross_validation import tx_rappel_total
 from scripts.recommandation_gen import fn_recommandations
+
 # Region[Blue] Init : read csv data
 
 
@@ -101,7 +102,7 @@ def main(Q1=True, Q2=True, Q3=True, Q4=True, Q5=False):
         start = time.time()
         result = tx_rappel_total(adjacent, abstract, fn_recommandations)
         print("Taux de rappel moyen avec 10 folds et 5 expérience : {:.2f}%".format(result*100))
-        print("%s secondes " % (time.time() - start))
+        print("Temps d'exécution : %s secondes " % int(time.time() - start))
 
 
 #EndRegion

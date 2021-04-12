@@ -47,7 +47,7 @@ def tx_rappel_total(df_adjacence, abstract, fn_recommandations, n=5):
             exp.append(recall)
 
             i += 1
-            printProgressBar(i, n*10, prefix='Progress:', suffix='Complete', length=50)
+            printProgressBar(i, n*10, prefix='Progress:', suffix='complete', length=50)
         recall_mx.append(exp)
 
     return np.mean(recall_mx)
