@@ -45,7 +45,7 @@ seed = 73
 tf.random.set_seed(seed)
 shuffled = votes.shuffle(len(votes), seed=seed, reshuffle_each_iteration=False)
 
-#Gardez 75% des données pour l'entraînement et 25% pour le test
+# Gardez 75% des données pour l'entraînement et 25% pour le test
 train_size = int(len(shuffled) * 0.75)
 train = shuffled.take(train_size) # 75000
 test = shuffled.skip(train_size).take(len(shuffled)-train_size) # 25000
@@ -54,7 +54,7 @@ test = shuffled.skip(train_size).take(len(shuffled)-train_size) # 25000
 films_titres = films.batch(len(films))
 user_ids = votes.batch(len(votes)).map(lambda x: x["user_id"])
 
-#Question 2 : Combien y a-t-il d'utilisateurs uniques et de films uniques
+# Question 2 : Combien y a-t-il d'utilisateurs uniques et de films uniques
 unique_films_titres = np.unique(np.concatenate(list(films_titres)))
 unique_user_ids = np.unique(np.concatenate(list(user_ids)))
 
@@ -76,7 +76,7 @@ user_model = tf.keras.Sequential([tf.keras.layers.experimental.preprocessing.Str
 
 
 # On définit maintenant l'embedding de la la portion film
-film_model = tf.keras.Sequential([tf.keras.layers.experimental.preprocessing.StringLookup(vocabulary=unique_films_titres,mask_token=None),
+film_model = tf.keras.Sequential([tf.keras.layers.experimental.preprocessing.StringLookup(vocabulary=unique_films_titres, mask_token=None),
                                    tf.keras.layers.Embedding(len(unique_films_titres) + 1,
                                                              embedding_dimension)])                              
                                                            
@@ -106,7 +106,7 @@ class MovieLensModel(tfrs.Model):
 #Question 4 : Donnez une piste de solution pour complexifier le présent modèle et tirer pleinement profit de l'approche réseau de neuronnes? Quelle serait sa principale limite?
 #Réponse: Répondez ICI
     
-#Question 5 : Est-ce que le présent réseau de neuronne est plus, moins ou également performant par rapport à une approche de factorisation matricielle classique après 1 epoch d'entraînement? 
+#Question 5 : Est-ce que le présent réseau de neuronne est plus, moins ou également performant par rapport à une approche de factorisation matricielle classique après 1 epoch d'entraînement?
 #Réponse: Répondez ICI
 
 model = MovieLensModel(user_model, film_model)
@@ -135,8 +135,6 @@ while top_100_categorical_top_k < 0.4:
     loss.append(result.history['total_loss'][0])
 
     test_top_100.append(model.evaluate(cached_test, return_dict=True)['factorized_top_k/top_100_categorical_accuracy'])
-
-print(epoch)
 
 
 #Question 8 : Si on obtenait des données d'entraînement supplémentaires dans le futur, devrait-on recommencer l'entraînement du modèle sur l'ensemble du corpus augmenté des nouvelles données ? 
