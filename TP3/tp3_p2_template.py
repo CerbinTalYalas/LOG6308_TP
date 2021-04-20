@@ -41,7 +41,6 @@ votes = tfds.load("movielens/100k-ratings", split="train")
 films = tfds.load("movielens/100k-movies", split="train")   
       
       
-# On doit faire un mapping des attibuts nécessaires      
 # On doit faire un mapping des attibuts nécessaires
 #Pour votes, gardez les attributs "movie_title", "user_id" et "user_rating"
 #Pour films, gardez les attributs "movie_title"
@@ -103,7 +102,6 @@ class RankingModel(tf.keras.Model):
 task = tfrs.tasks.Ranking(loss = tf.keras.losses.MeanSquaredError(),metrics=[tf.keras.metrics.RootMeanSquaredError()])
 
 
-
 class MovieLensModel(tfrs.models.Model):
 
   def __init__(self):
@@ -121,7 +119,6 @@ class MovieLensModel(tfrs.models.Model):
     return votes_predictions, film_embedding
 
 
-  
   def compute_loss(self, features: Dict[Text, tf.Tensor], training=False) -> tf.Tensor:
     votes_predictions, film_embedding = self.ranking_model(
         (features["user_id"], features["movie_title"]))
@@ -129,10 +126,10 @@ class MovieLensModel(tfrs.models.Model):
     
     return self.task(labels=features["user_rating"], predictions=votes_predictions)
 
+
 model = MovieLensModel()
 model.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.1))
 
-#quand on fait modèle.predict on peut faire un seul batch pour tout feed en même temps
 #Segmenter les batchs de manière à ce que le modèle roule 10 batch d'entraînement et 13 batchs de test par epoch, tout en ayant un batch size qui est un multiple de 2^n.  
 train_batch_size = 2**ceil(log(len(train)/10,2))
 test_batch_size = 2**ceil(log(len(test)/13,2))
@@ -152,9 +149,10 @@ while RMSE > 0.925:
     RMSE_Test.append(model.evaluate(cached_test, return_dict=True)['root_mean_squared_error'])
     epoch += 1
 
-print(epoch)
+print("Question 3 : RMSE inférieur à 0.925 au bout de ", epoch, " epochs")
 
-#Question 4 : Faites le graphique du RMSE d'entraînement et de test selon le nombre d'epochs. Pour combien d'epochs devraient-on entraîner ce modèle? 11
+#Question 4 : Faites le graphique du RMSE d'entraînement et de test selon le nombre d'epochs. Pour combien d'epochs devraient-on entraîner ce modèle?
+#Réponse: On devrait entraîner ce modèle pour 20 epochs. A partir de 20 epochs, la RMSE ne diminue plus.
 
 data = pd.DataFrame(dict(Epoch=np.arange(1, epoch+1, 1), Train = RMSE_Train, Test = RMSE_Test))
 data = pd.melt(data, ["Epoch"], var_name="type", value_name="RMSE")
@@ -207,7 +205,7 @@ prediction_10_epoch, embedding_10_epoch = model_10_epoch.predict(cached_sample)
 prediction_20_epoch, embedding_20_epoch = model_20_epoch.predict(cached_sample)
 
 votes_value = votes.map(lambda x: x["user_rating"])
-votes_list = list(tfds.as_numpy(votes_value))\
+votes_list = list(tfds.as_numpy(votes_value))
 
 df_votes = pd.DataFrame(dict(Epoch_1 = prediction_1_epoch.flatten(),
                               Epoch_5 = prediction_5_epoch.flatten(),
@@ -215,9 +213,8 @@ df_votes = pd.DataFrame(dict(Epoch_1 = prediction_1_epoch.flatten(),
                               Epoch_20 = prediction_20_epoch.flatten(),
                               Expected_vote = votes_list))
 
-#
 
-fig, axes = plt.subplots(nrows= 2, ncols = 2, figsize=(12,12))
+fig, axes = plt.subplots(nrows= 2, ncols = 2, figsize=(10,10))
 fig.suptitle("Comparaison des performances selon le nombre d'epochs d'entrainement")
 axes[0,0].set(ylim=(1,5))
 axes[0,1].set(ylim=(1,5))
@@ -251,10 +248,34 @@ df_result.loc["5ep"] = df_grouped_votes.loc["Epoch_5"].to_numpy().transpose().fl
 df_result.loc["10ep"] = df_grouped_votes.loc["Epoch_10"].to_numpy().transpose().flatten()
 df_result.loc["20ep"] = df_grouped_votes.loc["Epoch_20"].to_numpy().transpose().flatten()
 
+print("Question 7 :")
+print("Moyennes et écart-types à différentes epochs\n")
+print(df_result)
+print("\n= = =")
 
 #Question 8 : En vous servant de la distance cosinus, effectuez un calcul de similarité entre les embeddings des
 #films pour retrouver les 5 films les plus semblables à 1) Pulp Fiction (id 3)
-#2) Silence of the Lambs (id 43) et 3) 2001: A Space Odyssey (id 264) . Affichez les résultats.
+#2) Silence of the Lambs (id 43) et 3) 2001: A Space Odyssey (id 264). Affichez les résultats.
 
 
-    
+def top5_similar(iid, film_names):
+    cos_similarity = 1 - scipy.spatial.distance.cdist([embedding_20_epoch[iid]], embedding_20_epoch, 'cosine')
+    unique_cos, unique_index = np.unique(cos_similarity, return_index=True)
+
+    top5_index = np.flip(unique_index[-6:-1])
+    top5_cos = np.flip(unique_cos[-6:-1])
+
+    for (index, cos) in zip(top5_index, top5_cos):
+        print("| "+film_names[index].decode("utf-8")+" - "+str(cos)[0:4])
+
+print("\nQuestion 8 :")
+film_names = list(tfds.as_numpy(votes.map(lambda x: x["movie_title"])))
+print("5 films les plus semblables à Pulp Fiction (id 3)")
+top5_similar(3, film_names)
+print("= = =")
+print("5 films les plus semblables à Silence of the Lambs (id 43)")
+top5_similar(43, film_names)
+print("= = =")
+print("5 films les plus semblables à 2001: A Space Odyssey (id 264)")
+top5_similar(264, film_names)
+print("= = =")
