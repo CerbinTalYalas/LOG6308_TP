@@ -209,23 +209,47 @@ prediction_20_epoch, embedding_20_epoch = model_20_epoch.predict(cached_sample)
 votes_value = votes.map(lambda x: x["user_rating"])
 votes_list = list(tfds.as_numpy(votes_value))\
 
-df_votes = pd.DataFrame(dict(Predicted_vote_1_epoch = prediction_1_epoch.flatten(),
-                              Predicted_vote_5_epoch = prediction_5_epoch.flatten(),
-                              Predicted_vote_10_epoch = prediction_10_epoch.flatten(),
-                              Predicted_vote_20_epoch = prediction_20_epoch.flatten(),
+df_votes = pd.DataFrame(dict(Epoch_1 = prediction_1_epoch.flatten(),
+                              Epoch_5 = prediction_5_epoch.flatten(),
+                              Epoch_10 = prediction_10_epoch.flatten(),
+                              Epoch_20 = prediction_20_epoch.flatten(),
                               Expected_vote = votes_list))
 
-#ax = sns.boxplot(x="Excpected_vote", y="Predicted_vote_1_epoch", data=pd_vote)
-#ax.set(ylim=(1,5))
-#plt.show()
+#
 
-#Réponse: Commentez ICI
+fig, axes = plt.subplots(nrows= 2, ncols = 2, figsize=(12,12))
+fig.suptitle("Comparaison des performances selon le nombre d'epochs d'entrainement")
+axes[0,0].set(ylim=(1,5))
+axes[0,1].set(ylim=(1,5))
+axes[1,0].set(ylim=(1,5))
+axes[1,1].set(ylim=(1,5))
+
+sns.boxplot(ax = axes[0,0], x="Expected_vote", y="Epoch_1", data=df_votes, showfliers = False)
+sns.boxplot(ax = axes[0,1], x="Expected_vote", y="Epoch_5", data=df_votes, showfliers = False)
+sns.boxplot(ax = axes[1,0], x="Expected_vote", y="Epoch_10", data=df_votes, showfliers = False)
+sns.boxplot(ax = axes[1,1], x="Expected_vote", y="Epoch_20", data=df_votes, showfliers = False)
+#ax.set(ylim=(1,5))
+plt.show()
+
+#Réponse: On observe que pour un petit nombre d'epoch, la prédiction varie peu : en particulier, pour une seule epochs autour de 3 (le vote moyen standard,
+#         comme les votes varient entre 1 et 5), et pour 5 epochs autour de 3.5 (la moyenne sur l'ensemble d'entraînement). Cependant, à partir de 5 epochs,
+#         on remarque que les prédictions commencent à se différencier selon le vote attendu, et à s'ordonner : plus le vote attendu est grand, plus le vote
+#         prédit sera plus grand que le vote moyen, et inversement. En d'autres termes, on constate que les votes prédits se différencient et se précisent pour
+#         correspondre aux votes attendus. Cependant, il faut garder en tête qu'un trop grand nombre d'epochs pourrait mener à du surapprentissage.
 
 
 # 7 Compilez, dans un dataframe Pandas, les moyennes ainsi que les ecart-types des predictions pour chaque modèle et chaque vote.
 #Les lignes du dataframe devraient être : [1ep,5ep,10ep,20ep] et les colonnes devraient être : [moy_1,moy_2,moy_3,moy_4,moy_5,ec_1,ec_2,ec_3,ec_4,ec_5]
+df_votes = pd.melt(df_votes, ["Expected_vote"], var_name="Epoch", value_name="Predicted_vote")
+df_grouped_votes = df_votes.groupby(["Epoch", "Expected_vote"]).agg({'Predicted_vote': ['mean', 'std']})
 
+df_result = pd.DataFrame(index=["1ep","5ep","10ep","20ep"],
+                         columns=["moy_1","moy_2","moy_3","moy_4","moy_5","ec_1","ec_2","ec_3","ec_4","ec_5"])
 
+df_result.loc["1ep"] = df_grouped_votes.loc["Epoch_1"].to_numpy().transpose().flatten()
+df_result.loc["5ep"] = df_grouped_votes.loc["Epoch_5"].to_numpy().transpose().flatten()
+df_result.loc["10ep"] = df_grouped_votes.loc["Epoch_10"].to_numpy().transpose().flatten()
+df_result.loc["20ep"] = df_grouped_votes.loc["Epoch_20"].to_numpy().transpose().flatten()
 
 
 #Question 8 : En vous servant de la distance cosinus, effectuez un calcul de similarité entre les embeddings des
