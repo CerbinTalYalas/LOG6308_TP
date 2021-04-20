@@ -60,10 +60,10 @@ train = shuffled.take(train_size) # 75000
 test = shuffled.skip(train_size).take(len(shuffled)-train_size)
 
 # On vérifie combien d'utilisateurs et de films uniques     
-films_titres = films.batch(len(films))
+movie_title = films.batch(len(films))
 user_ids = votes.batch(len(votes)).map(lambda x: x["user_id"])
 
-unique_films_titres = np.unique(np.concatenate(list(films_titres)))
+unique_movie_title = np.unique(np.concatenate(list(movie_title)))
 unique_user_ids = np.unique(np.concatenate(list(user_ids)))
 
 class RankingModel(tf.keras.Model):
@@ -81,8 +81,8 @@ class RankingModel(tf.keras.Model):
     # Embeddings film.
     self.film_embeddings = tf.keras.Sequential([
       tf.keras.layers.experimental.preprocessing.StringLookup(
-        vocabulary=unique_films_titres, mask_token=None),
-      tf.keras.layers.Embedding(len(unique_films_titres) + 1, embedding_dimension)])
+        vocabulary=unique_movie_title, mask_token=None),
+      tf.keras.layers.Embedding(len(unique_movie_title) + 1, embedding_dimension)])
 
     #Calcule les prédictions
     self.votes = tf.keras.Sequential([
@@ -93,12 +93,11 @@ class RankingModel(tf.keras.Model):
 
   def call(self, inputs):
 
-    user_id, film_titre = inputs
+    user_id, movie_title = inputs
 
     user_embedding = self.user_embeddings(user_id)
-    film_embedding = self.film_embeddings(film_titre)
-
-    return self.votes(tf.concat([user_embedding, film_embedding], axis=1))#, film_embedding
+    film_embedding = self.film_embeddings(movie_title)
+    return self.votes(tf.concat([user_embedding, film_embedding], axis=1)), film_embedding
 
 #Il s'agit d'une tâche qui prend les valeurs vraies et prédites et qui retournent le loss ainsi que le RMSE associé 
 task = tfrs.tasks.Ranking(loss = tf.keras.losses.MeanSquaredError(),metrics=[tf.keras.metrics.RootMeanSquaredError()])
@@ -116,15 +115,15 @@ class MovieLensModel(tfrs.models.Model):
       metrics=[tf.keras.metrics.RootMeanSquaredError()]
     )
 
-  def call(self,features):
-    votes_predictions = self.ranking_model(
+  def call(self, features):
+    votes_predictions, film_embedding = self.ranking_model(
         (features["user_id"], features["movie_title"]))
-    return votes_predictions#, film_embedding
+    return votes_predictions, film_embedding
 
 
   
   def compute_loss(self, features: Dict[Text, tf.Tensor], training=False) -> tf.Tensor:
-    votes_predictions = self.ranking_model(
+    votes_predictions, film_embedding = self.ranking_model(
         (features["user_id"], features["movie_title"]))
 
     
@@ -139,6 +138,7 @@ train_batch_size = 2**ceil(log(len(train)/10,2))
 test_batch_size = 2**ceil(log(len(test)/13,2))
 cached_train = train.shuffle(len(train)).batch(train_batch_size).cache()
 cached_test = test.batch(test_batch_size).cache()
+cached_sample = sample.batch(len(sample))
 
 #Question 3 : Entraînez le modèle jusqu'à ce que le RMSE de l'entraînement soit inférieur à 0.925
 RMSE = 1
@@ -154,7 +154,7 @@ while RMSE > 0.925:
 
 print(epoch)
 
-#Question 4 : Faites le graphique du RMSE d'entraînement et de test selon le nombre d'epochs. Pour combien d'epochs devraient-on entraîner ce modèle?
+#Question 4 : Faites le graphique du RMSE d'entraînement et de test selon le nombre d'epochs. Pour combien d'epochs devraient-on entraîner ce modèle? 11
 
 data = pd.DataFrame(dict(Epoch=np.arange(1, epoch+1, 1), Train = RMSE_Train, Test = RMSE_Test))
 data = pd.melt(data, ["Epoch"], var_name="type", value_name="RMSE")
@@ -177,19 +177,55 @@ plt.grid(color='0.95')
 plt.legend(loc='upper left')
 plt.show()
 """
-#Question: Vous devez reprédire les votes avec le modèle entraîné. On va 
+
+# Question 5 : Vous devez implémenter la méthode call dans MovieLensModel pour exécuter la prochaine ligne.
+prediction, embedding = model.predict(cached_sample)
+
+
+#Question 6 : Vous devez reprédire les votes avec le modèle entraîné. On va
 #considérer 4 modèles : 1) après 1 epoch, 2) après 5 epochs 3) après 10 epochs et 4) après 20 epochs
 #Vous devez produire, pour chaque modèle un boxplot des prédictions pour chaque vote (ex: répartition des prédictions pour un rating attendu de 1, de 2... jusqu'à 5)
-#Commentez vos observations sur l'évolution du graphique en fonction du nombre d'epochs. 
+#Commentez vos observations sur l'évolution du graphique en fonction du nombre d'epochs.
+model_1_epoch = MovieLensModel()
+model_5_epoch = MovieLensModel()
+model_10_epoch = MovieLensModel()
+model_20_epoch = MovieLensModel()
 
-#Réponse: Commentez ICI 
+model_1_epoch.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.1))
+model_5_epoch.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.1))
+model_10_epoch.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.1))
+model_20_epoch.compile(optimizer=tf.keras.optimizers.Adagrad(learning_rate=0.1))
+
+model_1_epoch.fit(cached_train, epochs=1)
+model_5_epoch.fit(cached_train, epochs=5)
+model_10_epoch.fit(cached_train, epochs=10)
+model_20_epoch.fit(cached_train, epochs=20)
+
+prediction_1_epoch, embedding_1_epoch = model_1_epoch.predict(cached_sample)
+prediction_5_epoch, embedding_5_epoch = model_5_epoch.predict(cached_sample)
+prediction_10_epoch, embedding_10_epoch = model_10_epoch.predict(cached_sample)
+prediction_20_epoch, embedding_20_epoch = model_20_epoch.predict(cached_sample)
+
+votes_value = votes.map(lambda x: x["user_rating"])
+votes_list = list(tfds.as_numpy(votes_value))\
+
+df_votes = pd.DataFrame(dict(Predicted_vote_1_epoch = prediction_1_epoch.flatten(),
+                              Predicted_vote_5_epoch = prediction_5_epoch.flatten(),
+                              Predicted_vote_10_epoch = prediction_10_epoch.flatten(),
+                              Predicted_vote_20_epoch = prediction_20_epoch.flatten(),
+                              Expected_vote = votes_list))
+
+#ax = sns.boxplot(x="Excpected_vote", y="Predicted_vote_1_epoch", data=pd_vote)
+#ax.set(ylim=(1,5))
+#plt.show()
+
+#Réponse: Commentez ICI
 
 
 # 7 Compilez, dans un dataframe Pandas, les moyennes ainsi que les ecart-types des predictions pour chaque modèle et chaque vote.
 #Les lignes du dataframe devraient être : [1ep,5ep,10ep,20ep] et les colonnes devraient être : [moy_1,moy_2,moy_3,moy_4,moy_5,ec_1,ec_2,ec_3,ec_4,ec_5]
 
-# 5 Vous devez implémenter la méthode call dans MovieLensModel pour exécuter la prochaine ligne.
-# prediction,embedding_film_trained=model.predict(cached_sample)
+
 
 
 #Question 8 : En vous servant de la distance cosinus, effectuez un calcul de similarité entre les embeddings des
