@@ -221,10 +221,10 @@ axes[0,1].set(ylim=(1,5))
 axes[1,0].set(ylim=(1,5))
 axes[1,1].set(ylim=(1,5))
 
-sns.boxplot(ax = axes[0,0], x="Expected_vote", y="Epoch_1", data=df_votes, showfliers = False)
-sns.boxplot(ax = axes[0,1], x="Expected_vote", y="Epoch_5", data=df_votes, showfliers = False)
-sns.boxplot(ax = axes[1,0], x="Expected_vote", y="Epoch_10", data=df_votes, showfliers = False)
-sns.boxplot(ax = axes[1,1], x="Expected_vote", y="Epoch_20", data=df_votes, showfliers = False)
+sns.boxplot(ax = axes[0,0], x="Expected_vote", y="Epoch_1", data=df_votes, showfliers=False)
+sns.boxplot(ax = axes[0,1], x="Expected_vote", y="Epoch_5", data=df_votes, showfliers=False)
+sns.boxplot(ax = axes[1,0], x="Expected_vote", y="Epoch_10", data=df_votes, showfliers=False)
+sns.boxplot(ax = axes[1,1], x="Expected_vote", y="Epoch_20", data=df_votes, showfliers=False)
 #ax.set(ylim=(1,5))
 plt.show()
 
@@ -259,7 +259,7 @@ print("\n= = =")
 
 
 def top5_similar(iid, film_names):
-    cos_similarity = 1 - scipy.spatial.distance.cdist([embedding_20_epoch[iid]], embedding_20_epoch, 'cosine')
+    cos_similarity = 1 - scipy.spatial.distance.cdist([embedding[iid]], embedding, 'cosine')
     unique_cos, unique_index = np.unique(cos_similarity, return_index=True)
 
     top5_index = np.flip(unique_index[-6:-1])
