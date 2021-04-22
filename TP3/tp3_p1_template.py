@@ -191,6 +191,6 @@ index.index(films.batch(100).map(model.film_model), films)
 
 print("\nQuestion 13:")
 _, titles = index(tf.constant(["25"]))
-print("Recommendations for user 42:")
+print("Recommendations for user 25:")
 for title in titles[0, :5]:
     print("| "+title.numpy().decode("utf-8"))
